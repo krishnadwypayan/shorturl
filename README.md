@@ -68,4 +68,19 @@ The maximum length of a base62-encoded Snowflake ID is 11 characters, ensuring s
 go build -o bin/snowflake ./cmd/snowflake && ./bin/snowflake
 ```
 
+### Benchmark
+```sh
+Running tool: /usr/local/go/bin/go test -benchmem -run=^$ -bench ^BenchmarkNext$ github.com/krishnadwypayan/shorturl/internal/snowflake
+
+goos: darwin
+goarch: arm64
+pkg: github.com/krishnadwypayan/shorturl/internal/snowflake
+cpu: Apple M3 Max
+=== RUN   BenchmarkNext
+BenchmarkNext
+BenchmarkNext-14         4928491               244.0 ns/op            56 B/op          2 allocs/op
+PASS
+ok      github.com/krishnadwypayan/shorturl/internal/snowflake  1.607s
+```
+
 ---

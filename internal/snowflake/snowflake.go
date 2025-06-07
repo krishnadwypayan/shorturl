@@ -60,10 +60,10 @@ func (g *Generator) Next() uint64 {
 		var newSequence uint64
 
 		if now == int64(lastTimestamp) {
-			logger.Info().Msg("Current timestamp is the same as last, incrementing sequence")
+			logger.Debug().Msg("Current timestamp is the same as last, incrementing sequence")
 			newSequence = (sequence + 1) & maxSequence
 			if newSequence == 0 {
-				logger.Info().Msg("Sequence overflow")
+				logger.Debug().Msg("Sequence overflow")
 
 				for now <= int64(lastTimestamp) {
 					now = time.Now().UnixMilli() - epoch
@@ -80,7 +80,7 @@ func (g *Generator) Next() uint64 {
 
 		newState := (uint64(newTimestamp) << timestampShift) | (g.machineId << sequenceBits) | newSequence
 		if atomic.CompareAndSwapUint64(&g.state, currentState, newState) {
-			logger.Info().Msg(fmt.Sprintf("Generated new Snowflake ID: %d", newState))
+			logger.Debug().Msg(fmt.Sprintf("Generated new Snowflake ID: %d", newState))
 			return newState
 		}
 	}
