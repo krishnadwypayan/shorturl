@@ -73,7 +73,7 @@ func (g *Generator) Next() uint64 {
 				newTimestamp = int64(lastTimestamp)
 			}
 		} else {
-			logger.Trace().Msg("New timestamp detected, resetting sequence")
+			logger.Debug().Msg("New timestamp detected, resetting sequence")
 			newTimestamp = now
 			newSequence = 0
 		}
