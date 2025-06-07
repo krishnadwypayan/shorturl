@@ -91,3 +91,11 @@ func TestNext_TimestampIncreases(t *testing.T) {
 		t.Errorf("Timestamp did not increase: got %d then %d", ts1, ts2)
 	}
 }
+
+func BenchmarkNext(b *testing.B) {
+	gen := NewGenerator(1)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = gen.Next()
+	}
+}
