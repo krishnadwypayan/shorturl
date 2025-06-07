@@ -4,6 +4,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNext_UniqueIDs(t *testing.T) {
@@ -13,9 +15,7 @@ func TestNext_UniqueIDs(t *testing.T) {
 
 	for i := 0; i < n; i++ {
 		id := gen.Next()
-		if _, exists := ids[id]; exists {
-			t.Fatalf("Duplicate ID generated: %d", id)
-		}
+		assert.NotContains(t, ids, id, "ID should be unique")
 		ids[id] = struct{}{}
 	}
 }
@@ -25,9 +25,7 @@ func TestNext_MachineIDBits(t *testing.T) {
 	gen := NewGenerator(machineID)
 	id := gen.Next()
 	gotMachineID := (id >> sequenceBits) & ((1 << machineIdBits) - 1)
-	if gotMachineID != machineID {
-		t.Errorf("Machine ID bits not set correctly: got %d, want %d", gotMachineID, machineID)
-	}
+	assert.Equal(t, machineID, gotMachineID, "Machine ID bits should match the generator's machine ID")
 }
 
 func TestNext_SequenceIncrementsWithinSameMs(t *testing.T) {
@@ -38,10 +36,7 @@ func TestNext_SequenceIncrementsWithinSameMs(t *testing.T) {
 	id2 := gen.Next()
 	seq1 := id1 & maxSequence
 	seq2 := id2 & maxSequence
-
-	if seq2 != (seq1+1)&maxSequence && seq2 != 0 {
-		t.Errorf("Sequence did not increment as expected: got %d after %d", seq2, seq1)
-	}
+	assert.Equal(t, (seq1+1)&maxSequence, seq2, "Sequence should increment by 1 within the same millisecond")
 }
 
 func TestNext_Concurrent(t *testing.T) {
@@ -62,9 +57,7 @@ func TestNext_Concurrent(t *testing.T) {
 
 	seen := make(map[uint64]struct{})
 	for id := range ids {
-		if _, exists := seen[id]; exists {
-			t.Fatalf("Duplicate ID generated in concurrent use: %d", id)
-		}
+		assert.NotContains(t, seen, id, "ID should be unique in concurrent use")
 		seen[id] = struct{}{}
 	}
 }
@@ -87,9 +80,7 @@ func TestNext_TimestampIncreases(t *testing.T) {
 	ts1 := id1 >> timestampShift
 	ts2 := id2 >> timestampShift
 
-	if ts2 <= ts1 {
-		t.Errorf("Timestamp did not increase: got %d then %d", ts1, ts2)
-	}
+	assert.Greater(t, ts2, ts1, "Timestamp should increase between consecutive IDs")
 }
 
 func BenchmarkNext(b *testing.B) {
