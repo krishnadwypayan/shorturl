@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"regexp"
 	"strings"
 
@@ -12,7 +13,7 @@ import (
 	"github.com/krishnadwypayan/shorturl/internal/model"
 )
 
-var SnowflakeBaseUrl = "http://localhost:8080"
+var SnowflakeBaseUrl = getSnowflakeBaseUrl()
 
 const (
 	SnowflakeGenerateEndpoint = "/generate"
@@ -85,4 +86,11 @@ func validateShortURLRequest(req model.ShortURLRequest) error {
 		}
 	}
 	return nil
+}
+
+func getSnowflakeBaseUrl() string {
+	if v := os.Getenv("SNOWFLAKE_BASE_URL"); v != "" {
+		return v
+	}
+	return "http://localhost:8080" // default fallback
 }

@@ -10,7 +10,7 @@ import (
 func main() {
 	printBanner()
 	r := gin.Default()
-	routes.RegisterShortURLRoutes(r)
+	routes.RegisterShortifyRoutes(r)
 	r.Run(":8081")
 }
 

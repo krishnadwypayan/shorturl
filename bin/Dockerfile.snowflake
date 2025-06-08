@@ -1,0 +1,13 @@
+# Dockerfile for Snowflake Service
+FROM golang:1.24-alpine AS builder
+
+WORKDIR /app
+COPY . .
+
+WORKDIR /app/cmd/snowflake
+RUN go build -o /snowflake
+
+FROM alpine:latest
+COPY --from=builder /snowflake /snowflake
+EXPOSE 8080
+ENTRYPOINT ["/snowflake"]

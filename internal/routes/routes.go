@@ -24,7 +24,7 @@ func RegisterSnowflakeRoutes(r *gin.Engine, generator *snowflake.Generator) {
 	})
 }
 
-func RegisterShortURLRoutes(r *gin.Engine) {
+func RegisterShortifyRoutes(r *gin.Engine) {
 	// Route: Health check
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})

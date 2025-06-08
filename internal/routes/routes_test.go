@@ -36,7 +36,7 @@ func TestRegisterSnowflakeRoutes(t *testing.T) {
 func TestRegisterShortURLRoutes(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
-	RegisterShortURLRoutes(r)
+	RegisterShortifyRoutes(r)
 
 	// Test health check route
 	w := performGenerateRequest(r, "GET", "/health")
@@ -79,7 +79,7 @@ func TestRegisterShortURLRoutes(t *testing.T) {
 func BenchmarkShortifyRoute(b *testing.B) {
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
-	RegisterShortURLRoutes(r)
+	RegisterShortifyRoutes(r)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

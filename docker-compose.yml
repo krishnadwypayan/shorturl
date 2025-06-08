@@ -1,0 +1,18 @@
+services:
+  snowflake:
+    build:
+      context: .
+      dockerfile: bin/Dockerfile.snowflake
+    ports:
+      - "8080:8080"
+
+  shortify:
+    build:
+      context: .
+      dockerfile: bin/Dockerfile.shortify
+    ports:
+      - "8081:8081"
+    environment:
+      - SNOWFLAKE_BASE_URL=http://snowflake:8080
+    depends_on:
+      - snowflake

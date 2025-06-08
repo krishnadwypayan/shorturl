@@ -1,0 +1,13 @@
+# Dockerfile for Shortify Service
+FROM golang:1.24-alpine AS builder
+
+WORKDIR /app
+COPY . .
+
+WORKDIR /app/cmd/shortify
+RUN go build -o /shortify
+
+FROM alpine:latest
+COPY --from=builder /shortify /shortify
+EXPOSE 8081
+ENTRYPOINT ["/shortify"]
