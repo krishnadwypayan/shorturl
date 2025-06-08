@@ -25,6 +25,12 @@
 
 ---
 
+## Build and run
+Build using docker
+```sh
+docker-compose up -d
+```
+
 ---
 
 ## Shortify Service
@@ -114,10 +120,7 @@ This 64-bit integer is then **encoded in base62** (using digits, uppercase, and 
 **Note:**  
 The maximum length of a base62-encoded Snowflake ID is 11 characters, ensuring short and user-friendly URLs.
 
-### Build and run snowflake
-```sh
-go build -o bin/snowflake ./cmd/snowflake && ./bin/snowflake
-```
+### Sample Request
 
 ```sh
 curl -X GET http://localhost:8080/generate
