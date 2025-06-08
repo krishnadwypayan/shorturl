@@ -26,7 +26,7 @@
 ---
 
 ## Build and run
-Build using docker
+Using docker, one can start both the services - `shortify` and `snowflake`
 ```sh
 docker-compose up -d
 ```
