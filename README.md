@@ -25,6 +25,57 @@
 
 ---
 
+---
+
+## Shortify Service
+
+The **Shortify service** is responsible for generating short URLs by accepting long URLs (and optional custom aliases) and returning a shortened URL. It communicates with the Snowflake service to obtain unique IDs for each short URL.
+
+### How it works
+
+1. **Request:**  
+   Send a POST request to the Shortify service with a JSON body containing the long URL and (optionally) a custom alias.
+
+   **Example:**
+   ```sh
+   curl -X POST http://localhost:8081/shortify \
+     -H "Content-Type: application/json" \
+     -d '{"long_url": "https://www.google.com"}'
+   ```
+
+2. **Response:**  
+   The service responds with a JSON object containing the original long URL, the generated short URL, and the unique ID.
+
+   **Example response:**
+   ```json
+   {
+     "long_url": "https://www.google.com",
+     "short_url": "http://short.ify/k9d8F2xZ1Qw",
+     "id": "k9d8F2xZ1Qw"
+   }
+   ```
+
+### Features
+
+- **Custom Aliases:**  
+  You can provide an `alias` field in the request to use a custom short code, if available.
+
+- **Validation:**  
+  The service validates the long URL format and the alias (if provided).
+
+- **Integration:**  
+  The service calls the Snowflake service to generate a unique ID if no alias is provided.
+
+### Example request with custom alias
+
+```sh
+curl -X POST http://localhost:8081/shortify \
+  -H "Content-Type: application/json" \
+  -d '{"long_url": "https://www.google.com", "alias": "goog"}'
+```
+
+---
+
 ## ID Generation with Snowflake
 
 This URL shortener uses the [Snowflake algorithm](https://en.wikipedia.org/wiki/Snowflake_ID) to generate unique, time-ordered IDs for each short URL. Snowflake is a distributed unique ID generator inspired by Twitter's Snowflake, ensuring that each generated ID is:
