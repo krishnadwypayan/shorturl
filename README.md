@@ -1,5 +1,4 @@
 # URL Shortener
----
 
 ## Functional requirements
 1. Short URL generation: generate a unique shorter alias of the given URL.
