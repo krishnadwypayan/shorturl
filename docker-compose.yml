@@ -13,6 +13,8 @@ services:
     ports:
       - "8081:8081"
     environment:
-      - SNOWFLAKE_BASE_URL=http://snowflake:8080
+      - SNOWFLAKE_BASE_URL=${SNOWFLAKE_BASE_URL}
+      - MONGO_USERNAME=${MONGO_USERNAME}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
     depends_on:
       - snowflake

@@ -11,6 +11,7 @@ import (
 
 	"github.com/krishnadwypayan/shorturl/internal/logger"
 	"github.com/krishnadwypayan/shorturl/internal/model"
+	"github.com/krishnadwypayan/shorturl/internal/mongo"
 )
 
 var SnowflakeBaseUrl = getSnowflakeBaseUrl()
@@ -18,6 +19,7 @@ var SnowflakeBaseUrl = getSnowflakeBaseUrl()
 const (
 	SnowflakeGenerateEndpoint = "/generate"
 	ShortUrl                  = "http://short.ify/"
+	DefaultTTL                = 86400 // 24 hours in seconds
 )
 
 func Shortify(req model.ShortURLRequest) (model.ShortURLResponse, error) {
@@ -45,27 +47,46 @@ func Shortify(req model.ShortURLRequest) (model.ShortURLResponse, error) {
 }
 
 func generateUniqueID(req model.ShortURLRequest) (string, error) {
-	if req.Alias != "" {
-		// If an alias is provided, use it as the ID
-		return req.Alias, nil
-	}
-
-	res, err := http.Get(SnowflakeBaseUrl + SnowflakeGenerateEndpoint)
-	if err != nil {
-		logger.Error().Msg(fmt.Sprintf("Failed to call snowflake service: %v", err))
-		return "", errors.New("failed to generate unique ID")
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		logger.Error().Msg(fmt.Sprintf("Snowflake service returned status: %d", res.StatusCode))
-		return "", errors.New("failed to generate unique ID")
-	}
-
 	var snowflakeRes model.SnowflakeResponse
-	if err := json.NewDecoder(res.Body).Decode(&snowflakeRes); err != nil {
-		logger.Error().Msg(fmt.Sprintf("Failed to decode snowflake response: %v", err))
-		return "", errors.New("failed to generate unique ID")
+
+	if req.Alias != "" {
+		// TODO : Check if the alias already exists in the database
+		exists, _ := mongo.CheckAliasExists(req.Alias)
+		if exists {
+			logger.Error().Msg(fmt.Sprintf("Alias already exists: %s", req.Alias))
+			return "", errors.New("alias already exists")
+		}
+
+		// If an alias is provided, use it as the ID
+		snowflakeRes.ID = req.Alias
+	} else {
+		res, err := http.Get(SnowflakeBaseUrl + SnowflakeGenerateEndpoint)
+		if err != nil {
+			logger.Error().Msg(fmt.Sprintf("Failed to call snowflake service: %v", err))
+			return "", errors.New("failed to generate unique ID")
+		}
+		defer res.Body.Close()
+
+		if res.StatusCode != http.StatusOK {
+			logger.Error().Msg(fmt.Sprintf("Snowflake service returned status: %d", res.StatusCode))
+			return "", errors.New("failed to generate unique ID")
+		}
+
+		if err := json.NewDecoder(res.Body).Decode(&snowflakeRes); err != nil {
+			logger.Error().Msg(fmt.Sprintf("Failed to decode snowflake response: %v", err))
+			return "", errors.New("failed to generate unique ID")
+		}
+	}
+
+	// set default TTL if not provided
+	if req.TTL <= 0 {
+		req.TTL = DefaultTTL
+	}
+
+	err := mongo.InsertUrlMapping(req, snowflakeRes.ID)
+	if err != nil {
+		logger.Error().Msg(fmt.Sprintf("Failed to insert URL mapping: %v", err))
+		return "", fmt.Errorf("failed to insert URL mapping: %w", err)
 	}
 	return snowflakeRes.ID, nil
 }
